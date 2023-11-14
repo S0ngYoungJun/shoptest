@@ -38,7 +38,7 @@ router.post('/cart/add', async (req, res, next) => {
     res.json(result);
   } catch (error) {
     console.error('Error in /api/cart/add:', error);
-    return next(error); // 응답을 보내지 않고 에러만 전달
+     next(error); // 응답을 보내지 않고 에러만 전달
   }
 });
 

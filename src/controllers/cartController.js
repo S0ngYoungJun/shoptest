@@ -5,7 +5,9 @@ exports.getCart = async (req, res) => {
   try {
     const userId = req.user; // Assuming you have user authentication middleware
     const cart = await Cart.findOne({ user: userId }).populate('items.product','_id name price');
-    res.json(cart || { items: [], total: 0 });
+    if (!res.headersSent) {
+      res.json(cart || { items: [], total: 0 });
+    }
   } catch (error) {
     res.status(500).json({ error: 'Internal Server Error' });
   }
@@ -28,19 +30,21 @@ exports.addToCart = async (req, res) => {
       return res.status(404).json({ error: '상품을 찾을 수 없습니다.' });
     }
 
-    const existingItemIndex = cart.items.findIndex(item => String(item.product) === String(productId));
+    const existingItem = cart.items.find(item => String(item.product) === String(productId));
 
-    if (existingItemIndex !== -1) {
+    if (existingItem) {
       // 상품이 이미 카트에 있는 경우 수량을 업데이트
-      cart.items[existingItemIndex].quantity += quantity;
+      existingItem.quantity += quantity;
     } else {
       // 새로운 상품 추가
       cart.items.push({ product: productId, quantity });
     }
 
     await cart.save();
-    // 카트가 저장된 후에 응답을 보냅니다.
-    return res.json({ message: '상품이 장바구니에 성공적으로 추가되었습니다.' });
+    console.log('Successfully added to cart')
+    if (!res.headersSent) {
+      res.json({ message: '상품이 장바구니에 성공적으로 추가되었습니다.' });
+    }
   } catch (error) {
     console.error('addToCart에서 오류:', error);
     return res.status(500).json({ error: '내부 서버 오류', message: error.message });

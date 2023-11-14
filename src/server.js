@@ -1,18 +1,29 @@
 const express = require('express');
 const mongoose = require('mongoose');
 const bodyParser = require('body-parser');
+const cors = require('cors');
 const routes = require('./routes')
 const path = require('path')
 const app = express();
 
 app.use(bodyParser.json());
-
+app.use(cors())
 // Example middleware for user authentication (assuming user ID is passed in the request header)
 app.use((req, res, next) => {
   req.user = 'exampleUserId'; // Replace with your actual user authentication logic
   next();
 });
 app.use(express.static(path.join(__dirname, '../public')));
+
+app.use((err, req, res, next) => {
+  // 이미 응답이 전송된 경우 무시
+  if (res.headersSent) {
+    return next(err);
+  }
+
+  // 에러를 JSON 형태로 응답
+  res.status(500).json({ error: 'Internal Server Error', message: err.message });
+});
 
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../public', 'index.html'));

@@ -92,37 +92,39 @@ document.addEventListener('DOMContentLoaded', () => {
   // Function to add a product to the cart
   async function addToCart(productId, productName, productPrice) {
     try {
-      const response = await fetch('http://localhost:3000/api/cart/add', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ productId, quantity: 1 }),
-      });
-  
-      if (!response.ok) {
-        console.error('Server response is not OK:', response);
-        return;
-      }
-  
-      const result = await response.json();
-  
-      // result가 undefined인 경우 처리
-      if (result === undefined) {
-        console.error('Server response is undefined:', response);
-        return;
-      }
-  
-      console.log(result.message);
-  
-      // 장바구니 표시를 새로 고침
-      const cartResponse = await fetch('http://localhost:3000/api/cart');
-      const cart = await cartResponse.json();
-      displayCart(cart);
+        const response = await fetch('http://localhost:3000/api/cart/add', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+            },
+            body: JSON.stringify({ productId, quantity: 1 }),
+        });
+        console.log('Response Status:', response.status);
+        if (!response.ok) {
+            console.error('Server response is not OK:', response);
+            return;
+        }
+
+        // result가 undefined인 경우 처리
+        let responseBody;
+        try {
+            responseBody = await response.text();
+        } catch (error) {
+            console.error('Error reading response body:', error);
+            return;
+        }
+
+        const result = JSON.parse(responseBody);
+        console.log(result.message);
+
+        // 장바구니 표시를 새로 고침
+        const cartResponse = await fetch('http://localhost:3000/api/cart');
+        const cart = await cartResponse.json();
+        displayCart(cart);
     } catch (error) {
-      console.error('장바구니에 추가 중 에러 발생:', error);
+        console.error('장바구니에 추가 중 에러 발생:', error);
     }
-  }
+}
 
   // Function to handle checkout button click
   checkoutBtn.addEventListener('click', async () => {
