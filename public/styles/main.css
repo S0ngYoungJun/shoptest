@@ -1,0 +1,64 @@
+body {
+  font-family: 'Arial', sans-serif;
+  margin: 0;
+  padding: 0;
+  background-color: #f4f4f4;
+}
+
+header {
+  background-color: #333;
+  color: white;
+  padding: 1em;
+  text-align: center;
+}
+
+main {
+  max-width: 800px;
+  margin: 20px auto;
+  background-color: white;
+  padding: 20px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+}
+
+h2 {
+  color: #333;
+}
+
+ul {
+  list-style: none;
+  padding: 0;
+}
+
+li {
+  margin-bottom: 10px;
+}
+
+button {
+  background-color: #333;
+  color: white;
+  padding: 10px 15px;
+  border: none;
+  cursor: pointer;
+  font-size: 16px;
+}
+
+button:hover {
+  background-color: #555;
+}
+
+#cart {
+  margin-top: 20px;
+}
+
+#cart-list {
+  border-top: 1px solid #ccc;
+  padding-top: 10px;
+}
+
+#cart p {
+  margin-top: 10px;
+}
+
+#cart-total {
+  font-weight: bold;
+}
