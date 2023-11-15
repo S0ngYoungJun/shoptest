@@ -11,7 +11,9 @@ exports.getCart = async (req, res) => {
       res.json(cart || { items: [], total: 0 });
     }
   } catch (error) {
+    if (!res.headersSent) {
     res.status(500).json({ error: 'Internal Server Error' });
+    }
   }
 };
 

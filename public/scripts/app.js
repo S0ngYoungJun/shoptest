@@ -165,13 +165,8 @@ document.addEventListener('DOMContentLoaded', () => {
       const orderResult = await orderResponse.json();
       console.log(orderResult.message);
   
-      // Reset the cart after checkout
-      const updatedCartResponse = await fetch('http://localhost:3000/api/cart');
-      const updatedCart = await updatedCartResponse.json();
-      displayCart(updatedCart);
-      
-      // Redirect to checkout.html
-      window.location.href = '/public/checkout.html';
+      const queryString = `?items=${JSON.stringify(cart.items)}&total=${cart.total}`;
+      window.location.href = `/public/checkout.html${queryString}`;
     } catch (error) {
       console.error('Error handling checkout:', error);
     }

@@ -1,8 +1,9 @@
+const mongoose = require('mongoose');
 const Order = require('../models/Order');
 const Cart = require('../models/Cart');
 
 exports.createOrder = async (req, res) => {
-  const { items} = req.body;
+  const { items } = req.body;
   const userId = mongoose.Types.ObjectId(req.user);
 
   try {
