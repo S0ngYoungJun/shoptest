@@ -71,23 +71,34 @@ document.addEventListener('DOMContentLoaded', () => {
     }
     
 
-  function displayCart(cart) {
-    cartList.innerHTML = '';
-    let total = 0;
-
-    // Check if cart.items is defined before using forEach
-    if (cart.items) {
-      cart.items.forEach(item => {
-        const li = document.createElement('li');
-        li.innerHTML = `<span>${item.product.name} - $${item.product.price.toFixed(2)}</span> - Quantity: ${item.quantity}`;
-        cartList.appendChild(li);
-
-        total += item.product.price * item.quantity;
-      });
+    function displayCart(cart) {
+      cartList.innerHTML = '';
+      let total = 0;
+    
+      // Check if cart.items is defined before using forEach
+      if (cart.items) {
+        cart.items.forEach(item => {
+          const li = document.createElement('li');
+    
+          // Check if item.product is not null before accessing its properties
+          if (item.product) {
+            const productName = item.product ? item.product.name || '상품명 없음' : '상품 정보 없음';
+const productPrice = item.product ? (item.product.price !== undefined ? `$${item.product.price.toFixed(2)}` : '가격 정보 없음') : '';
+    
+            li.innerHTML = `<span>${productName} - ${productPrice}</span> - Quantity: ${item.quantity}`;
+            cartList.appendChild(li);
+    
+            total += (item.product.price || 0) * item.quantity;
+          } else {
+            // Handle the case where item.product is undefined
+            li.innerHTML = '<span>상품 정보 없음</span>';
+            cartList.appendChild(li);
+          }
+        });
+      }
+    
+      cartTotal.textContent = total.toFixed(2);
     }
-
-    cartTotal.textContent = total.toFixed(2);
-  }
 
   // Function to add a product to the cart
   async function addToCart(productId, productName, productPrice) {
@@ -120,6 +131,14 @@ document.addEventListener('DOMContentLoaded', () => {
         // 장바구니 표시를 새로 고침
         const cartResponse = await fetch('http://localhost:3000/api/cart');
         const cart = await cartResponse.json();
+        const existingItem = cart.items.find(item => String(item.product) === String(productId));
+        if (existingItem) {
+          // 상품이 이미 카트에 있는 경우 수량을 업데이트
+          existingItem.quantity += 1;
+        } else {
+          // 새로운 상품 추가
+          cart.items.push({ product: productId, quantity: 1 });
+        }
         displayCart(cart);
     } catch (error) {
         console.error('장바구니에 추가 중 에러 발생:', error);
@@ -129,12 +148,15 @@ document.addEventListener('DOMContentLoaded', () => {
   // Function to handle checkout button click
   checkoutBtn.addEventListener('click', async () => {
     try {
+      const cartResponse = await fetch('http://localhost:3000/api/cart');
+      const cart = await cartResponse.json();
+  
       const orderResponse = await fetch('http://localhost:3000/api/order', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
         },
-        body: JSON.stringify({ items: [], total: 0 }), // Pass the order details as needed
+        body: JSON.stringify({ items: cart.items, total: cart.total }), // Pass the cart details to the order
       });
   
       if (!orderResponse.ok) {
@@ -146,10 +168,14 @@ document.addEventListener('DOMContentLoaded', () => {
       console.log(orderResult.message);
   
       // Reset the cart after checkout
-      const cartResponse = await fetch('http://localhost:3000/api/cart');
-      const cart = await cartResponse.json();
-      displayCart(cart);
+      const updatedCartResponse = await fetch('http://localhost:3000/api/cart');
+      const updatedCart = await updatedCartResponse.json();
+      displayCart(updatedCart);
+      
+      // Redirect to checkout.html
+      window.location.href = '/public/checkout.html';
     } catch (error) {
       console.error('Error handling checkout:', error);
     }
-  })})
+  });
+})

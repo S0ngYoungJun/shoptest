@@ -38,9 +38,10 @@ db.once('open', () => {
   console.log('Connected to MongoDB');
 });
 app.use((err, req, res, next) => {
-  console.error(err.stack);
-  next(err);
-});
+  // 이미 응답이 전송된 경우 무시
+  if (res.headersSent) {
+    return next(err);
+  }});
 
 
 const PORT = process.env.PORT || 3000;
