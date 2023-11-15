@@ -2,6 +2,7 @@ const mongoose = require('mongoose');
 const Cart = require('../models/Cart');
 const Product = require('../models/Product');
 
+
 exports.getCart = async (req, res) => {
   try {
     const userId = req.user
@@ -13,6 +14,7 @@ exports.getCart = async (req, res) => {
     res.status(500).json({ error: 'Internal Server Error' });
   }
 };
+
 
 exports.addToCart = async (req, res) => {
   const { productId, quantity } = req.body;
@@ -29,7 +31,7 @@ exports.addToCart = async (req, res) => {
   try {
     const product = await Product.findOneAndUpdate(
       { _id: productId, quantity: { $gte: quantity } }, // 수량이 0보다 큰 경우에만 업데이트
-      { $inc: { quantity: -quantity  } }, // 수량 1 감소
+      { $inc: { quantity: -quantity  } }, 
       { new: true } // 업데이트 이후의 문서 반환
     );
   
@@ -61,12 +63,11 @@ exports.addToCart = async (req, res) => {
     // 서버 응답 전에 로컬 카트에 상품 추가
 
 
-    // 서버 응답을 받은 후에 로컬 카트에 상품 추가
-    const updatedCartResponse = await fetch('http://localhost:3000/api/cart');
-    const updatedCart = await updatedCartResponse.json();
-    displayCart(updatedCart);
-    res.json({ message: '상품이 성공적으로 추가되었습니다.', cart });
-    }catch (error) {
+    const updatedCart = await Cart.findOne({ user: userId }).populate('items.product', '_id name price quantity');
+    res.json({ message: '상품이 성공적으로 추가되었습니다.', cart: updatedCart });
+  } catch (error) {
     console.error('addToCart에서 오류:', error);
     return res.status(500).json({ error: '내부 서버 오류', message: error.message });
-    }};
+  }};
+
+    

@@ -24,7 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function displayProducts(products) {
       productList.innerHTML = '';
-    
       // products가 정의되지 않았거나 null인 경우 에러 출력 후 종료
       if (!products) {
         console.error('에러: 제품 데이터가 정의되지 않았거나 null입니다.');
@@ -83,7 +82,7 @@ document.addEventListener('DOMContentLoaded', () => {
           // Check if item.product is not null before accessing its properties
           if (item.product) {
             const productName = item.product ? item.product.name || '상품명 없음' : '상품 정보 없음';
-const productPrice = item.product ? (item.product.price !== undefined ? `$${item.product.price.toFixed(2)}` : '가격 정보 없음') : '';
+            const productPrice = item.product ? (item.product.price !== undefined ? `$${item.product.price.toFixed(2)}` : '가격 정보 없음') : '';
     
             li.innerHTML = `<span>${productName} - ${productPrice}</span> - Quantity: ${item.quantity}`;
             cartList.appendChild(li);
@@ -96,13 +95,12 @@ const productPrice = item.product ? (item.product.price !== undefined ? `$${item
           }
         });
       }
-    
       cartTotal.textContent = total.toFixed(2);
     }
 
   // Function to add a product to the cart
-  async function addToCart(productId, productName, productPrice) {
-    try {
+      async function addToCart(productId, productName, productPrice) {
+        try {
         const response = await fetch('http://localhost:3000/api/cart/add', {
             method: 'POST',
             headers: {
@@ -132,18 +130,18 @@ const productPrice = item.product ? (item.product.price !== undefined ? `$${item
         const cartResponse = await fetch('http://localhost:3000/api/cart');
         const cart = await cartResponse.json();
         const existingItem = cart.items.find(item => String(item.product) === String(productId));
-        if (existingItem) {
+          if (existingItem) {
           // 상품이 이미 카트에 있는 경우 수량을 업데이트
           existingItem.quantity += 1;
-        } else {
+          } else {
           // 새로운 상품 추가
           cart.items.push({ product: productId, quantity: 1 });
+          }
+          displayCart(cart);
+          } catch (error) {
+          console.error('장바구니에 추가 중 에러 발생:', error);
+          }
         }
-        displayCart(cart);
-    } catch (error) {
-        console.error('장바구니에 추가 중 에러 발생:', error);
-    }
-}
 
   // Function to handle checkout button click
   checkoutBtn.addEventListener('click', async () => {

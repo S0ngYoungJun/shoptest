@@ -14,22 +14,11 @@ app.use((req, res, next) => {
   next();
 });
 app.use(express.static(path.join(__dirname, '../public')));
-
-app.use((err, req, res, next) => {
-  // 이미 응답이 전송된 경우 무시
-  if (res.headersSent) {
-    return next(err);
-  }
-
-  // 에러를 JSON 형태로 응답
-  res.status(500).json({ error: 'Internal Server Error', message: err.message });
-});
-
 app.get('/', (req, res) => {
   res.sendFile(path.join(__dirname, '../public', 'index.html'));
 });
 
-app.use('/api', routes);
+
 
 mongoose.connect('mongodb://127.0.0.1:27017/shop', { useNewUrlParser: true, useUnifiedTopology: true });
 const db = mongoose.connection;
@@ -37,12 +26,17 @@ db.on('error', console.error.bind(console, 'MongoDB connection error:'));
 db.once('open', () => {
   console.log('Connected to MongoDB');
 });
+app.use('/api', routes);
 app.use((err, req, res, next) => {
-  // 이미 응답이 전송된 경우 무시
-  if (res.headersSent) {
-    return next(err);
-  }});
-
+    // 이미 응답이 전송된 경우 무시
+    if (res.headersSent) {
+      return next(err);
+    }
+    // 에러를 JSON 형태로 응답
+    res.status(500).json({ error: 'Internal Server Error', message: err.message });
+    
+  });
+  
 
 const PORT = process.env.PORT || 3000;
   app.listen(PORT, () => {

@@ -15,7 +15,7 @@ exports.createOrder = async (req, res) => {
     const total = calculateTotal(cart.items);
     const order = new Order({
       user: userId,
-      items: cart.items.map(item => ({ product: item.product, quantity: item.quantity })),
+      items: cart.items.map(item => ({ productId: item.product, quantity: item.quantity })),
       total,
     });
     // 주문 저장
